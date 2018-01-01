@@ -8,7 +8,9 @@ var bufferAlloc = require('buffer-alloc')
 
 var DELIM = '\0'
 
-module.exports = function (dbname, xopts) {
+module.exports = raidb
+
+function raidb (dbname, xopts) {
   if (!xopts) xopts = {}
   var idb = xopts.idb || (typeof window !== 'undefined'
     ? window.indexedDB || window.mozIndexedDB
@@ -30,6 +32,7 @@ module.exports = function (dbname, xopts) {
   } else {
     db = idb
   }
+  let StoreClass = xopts.Store || Store
   return function (name, opts) {
     if (typeof name === 'object') {
       opts = name
@@ -38,14 +41,16 @@ module.exports = function (dbname, xopts) {
 
     if (!opts) opts = {}
     opts.name = name
-
-    return new Store(Object.assign({ db: getdb }, xopts, opts))
+    
+    return new StoreClass(Object.assign({ db: getdb }, xopts, opts))
   }
   function getdb (cb) {
     if (db) nextTick(function () { cb(db) })
     else dbqueue.push(cb)
   }
 }
+
+raidb.Store = Store
 
 function Store (opts) {
   if (!(this instanceof Store)) return new Store(opts)
@@ -57,7 +62,11 @@ function Store (opts) {
   this.length = opts.length || 0
   this._getdb = opts.db
 }
-inherits(Store, Abstract)
+
+// as per node doc advice, replaced inherits(Store, Abstract)  https://nodejs.org/docs/latest/api/util.html#util_util_inherits_constructor_superconstructor
+class Inherited extends Abstract {}
+Store.prototype = Inherited.prototype
+Store.prototype.constructor = Store
 
 Store.prototype._blocks = function (i, j) {
   return blocks(this.size, i, j)

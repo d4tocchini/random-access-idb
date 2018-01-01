@@ -7,13 +7,14 @@
     "abstract-random-access": "^1.1.2",
     "buffer-alloc": "^1.1.0",
     "buffer-from": "^0.1.1",
-    "inherits": "^2.0.3",
     "mutexify": "^1.1.0",
     "next-tick": "^1.0.0",
     "once": "^1.4.0"
   },
   "devDependencies": {
+    "budo": "^10.0.4",
     "buffer-equals": "^1.0.4",
+    "random-access-memory": "^2.4.0",
     "randombytes": "^2.0.5",
     "tape": "^4.6.3"
   },
